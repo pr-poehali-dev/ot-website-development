@@ -22,6 +22,7 @@ const Index = () => {
   const [showTestDialog, setShowTestDialog] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
+  const [npaFilter, setNpaFilter] = useState('all');
 
   const npaDocuments = [
     {
@@ -235,7 +236,7 @@ const Index = () => {
             </div>
           </div>
 
-          <Tabs defaultValue="all" className="mb-6">
+          <Tabs defaultValue="all" value={npaFilter} onValueChange={setNpaFilter} className="mb-6">
             <TabsList>
               <TabsTrigger value="all">Все документы</TabsTrigger>
               <TabsTrigger value="gost">ГОСТ</TabsTrigger>
@@ -245,7 +246,15 @@ const Index = () => {
           </Tabs>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {npaDocuments.map((doc) => (
+            {npaDocuments
+              .filter((doc) => {
+                if (npaFilter === 'all') return true;
+                if (npaFilter === 'gost') return doc.category === 'ГОСТ';
+                if (npaFilter === 'standards') return doc.category === 'Профстандарт';
+                if (npaFilter === 'reports') return doc.category === 'Отчётность' || doc.category === 'Классификатор';
+                return true;
+              })
+              .map((doc) => (
               <Card key={doc.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => openNPADialog(doc)}>
                 <CardHeader>
                   <div className="flex justify-between items-start mb-2">
